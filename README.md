@@ -16,3 +16,5 @@ Description of the used parameters:
 - jkid: ID der Jobkette
 - e: Ende Flag
 - rc: Return Code des ausgeführten Jobs
+
+The output is written to json encoded file named stats-dpay.json.
