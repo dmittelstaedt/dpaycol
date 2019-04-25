@@ -27,5 +27,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Output to json encoded file (stats-dpay.json)
 - Checks for correct arguments for flags
 
-[Unreleased]: Link to HEAD
-[v0.0.1]: Link to HEAD
+[Unreleased]: https://github.com/dmittelstaedt/dpaycol
+[v0.0.1]: https://github.com/dmittelstaedt/dpaycol/tree/v0.0.1
