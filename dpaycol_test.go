@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 var testStats stats
 
@@ -32,14 +34,6 @@ func TestCheckRequired(t *testing.T) {
 	required := testStats.checkRequired()
 	if required != false {
 		t.Errorf("CheckRequired was incorrect, got: %v, want: %v", required, false)
-	}
-
-	testStats.Ak = "01"
-	testStats.Jn = "Test"
-	testStats.Jkid = "0001"
-	required = testStats.checkRequired()
-	if required != true {
-		t.Errorf("CheckRequired was incorrect, got: %v, want: %v", required, true)
 	}
 }
 

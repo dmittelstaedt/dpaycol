@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,6 +13,7 @@ import (
 // when the job finished.
 type stats struct {
 	Timestamp time.Time `json:"timestamp"`
+	HostName  string    `json:"hostname"`
 	Ak        string    `json:"ak"`
 	Am        int       `json:"am"`
 	Lt        string    `json:"lt"`
@@ -22,19 +24,36 @@ type stats struct {
 	RC        int       `json:"rc"`
 }
 
-const statsLog string = "stats-dpay.json"
+// constantes for log file and name of the parameters
+const (
+	statsLog string = "stats-dpay.json"
+	ak       string = "ak"
+	am       string = "am"
+	ut       string = "ut"
+	lt       string = "lt"
+	jn       string = "jn"
+	jkid     string = "jkid"
+	e        string = "e"
+	rc       string = "rc"
+	v        string = "v"
+)
 
 var runStats stats
+var version *bool
+var versionNumber string
+var gitCommit string
+var buildDate string
 
 func init() {
-	flag.StringVar(&runStats.Ak, "ak", "None", "Abrechnungskreis, required")
-	flag.IntVar(&runStats.Am, "am", 0, "Abrechnungsmonat, required")
-	flag.StringVar(&runStats.Lt, "lt", "None", "Lauftermin, optinal")
-	flag.StringVar(&runStats.Ut, "ut", "None", "Untertermin, optional")
-	flag.StringVar(&runStats.Jn, "jn", "None", "Jobname, required")
-	flag.StringVar(&runStats.Jkid, "jkid", "None", "ID of the Jobkette, required")
-	flag.BoolVar(&runStats.IsEnd, "e", false, "Ende, optional")
-	flag.IntVar(&runStats.RC, "rc", -1, "Return Code of the Job, required if e")
+	flag.StringVar(&runStats.Ak, ak, "", "Abrechnungskreis, required")
+	flag.IntVar(&runStats.Am, am, 0, "Abrechnungsmonat (1-12), required")
+	flag.StringVar(&runStats.Lt, lt, "None", "Lauftermin, optinal")
+	flag.StringVar(&runStats.Ut, ut, "None", "Untertermin, optional")
+	flag.StringVar(&runStats.Jn, jn, "", "Jobname, required")
+	flag.StringVar(&runStats.Jkid, jkid, "", "ID of the Jobkette, required")
+	flag.BoolVar(&runStats.IsEnd, e, false, "Ende, optional")
+	flag.IntVar(&runStats.RC, rc, -1, "Return Code of the Job, required if e")
+	version = flag.Bool(v, false, "Version")
 }
 
 // writeJSON writes the run statistics to a file in JSON encoding.
@@ -58,10 +77,25 @@ func (rs *stats) writeJSON() {
 
 // checkRequired checks if all required parameters are set
 func (rs *stats) checkRequired() bool {
-	if rs.Ak == "None" || rs.Am == 0 || rs.Jn == "None" || rs.Jkid == "None" {
-		return false
-	}
-	return true
+	requiredAk := false
+	requiredAm := false
+	requiredJn := false
+	requiredJkid := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == ak {
+			requiredAk = true
+		}
+		if f.Name == am {
+			requiredAm = true
+		}
+		if f.Name == jn {
+			requiredJn = true
+		}
+		if f.Name == jkid {
+			requiredJkid = true
+		}
+	})
+	return requiredAk && requiredAm && requiredJn && requiredJkid
 }
 
 // checkMonth checks if month is between 1 and 12.
@@ -87,17 +121,28 @@ func (rs *stats) checkEnd() bool {
 func main() {
 	flag.Parse()
 	runStats.Timestamp = time.Now()
+	runStats.HostName, _ = os.Hostname()
+
+	if *version {
+		fmt.Println("Version: " + versionNumber)
+		fmt.Println("Git Commit: " + gitCommit)
+		fmt.Println("Build Date: " + buildDate)
+		os.Exit(0)
+	}
 
 	if !runStats.checkRequired() {
-		log.Fatal("Missing required parameters.")
+		fmt.Println("Missing required parameters. Use -h for usage.")
+		os.Exit(1)
 	}
 
 	if !runStats.checkMonth() {
-		log.Fatal("Invalid month for am.")
+		fmt.Println("Invalid month for am. Use -h for usage.")
+		os.Exit(2)
 	}
 
 	if !runStats.checkEnd() {
-		log.Fatal("Wrong parameters for end condition.")
+		fmt.Println("Wrong parameters for end condition. Use -h for usage.")
+		os.Exit(3)
 	}
 
 	runStats.writeJSON()
