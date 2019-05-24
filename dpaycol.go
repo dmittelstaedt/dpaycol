@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type stats struct {
 	Timestamp time.Time `json:"timestamp"`
 	HostName  string    `json:"hostname"`
 	Ak        string    `json:"ak"`
-	Am        int       `json:"am"`
+	Am        string    `json:"am"`
 	Lt        string    `json:"lt"`
 	Ut        string    `json:"ut"`
 	Jn        string    `json:"jn"`
@@ -46,7 +47,7 @@ var buildDate string
 
 func init() {
 	flag.StringVar(&runStats.Ak, ak, "", "Abrechnungskreis, required")
-	flag.IntVar(&runStats.Am, am, 0, "Abrechnungsmonat (1-12), required")
+	flag.StringVar(&runStats.Am, am, "", "Abrechnungsmonat (YYYYMM), required")
 	flag.StringVar(&runStats.Lt, lt, "None", "Lauftermin, optinal")
 	flag.StringVar(&runStats.Ut, ut, "None", "Untertermin, optional")
 	flag.StringVar(&runStats.Jn, jn, "", "Jobname, required")
@@ -101,10 +102,11 @@ func (rs *stats) checkRequired() bool {
 
 // checkMonth checks if month is between 1 and 12.
 func (rs *stats) checkMonth() bool {
-	if rs.Am < 1 || rs.Am > 12 {
+	r, err := regexp.Compile("^\\d{4}(0[1-9]|1[0-2])$")
+	if err != nil {
 		return false
 	}
-	return true
+	return r.MatchString(rs.Am)
 }
 
 // checkEnd checks if end condition is correct set. Correct means either no e

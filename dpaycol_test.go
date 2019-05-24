@@ -9,7 +9,7 @@ var testStats stats
 func init() {
 	testStats = stats{
 		Ak:    "None",
-		Am:    0,
+		Am:    "None",
 		Jn:    "None",
 		Jkid:  "None",
 		IsEnd: false,
@@ -18,15 +18,24 @@ func init() {
 }
 
 func TestCheckMonth(t *testing.T) {
-	month := testStats.checkMonth()
-	if month != false {
-		t.Errorf("CheckMonth was incorrect, got: %v, want: %v", month, false)
+
+	tests := map[string]struct {
+		input string
+		want  bool
+	}{
+		"correct year and month < 10":       {"209903", true},
+		"correct year and month > 9":        {"209911", true},
+		"correct year and wrong month > 12": {"209913", false},
+		"correct year and wrong month > 20": {"209922", false},
+		"correct year and wrong month = 0":  {"209900", false},
 	}
 
-	testStats.Am = 01
-	month = testStats.checkMonth()
-	if month != true {
-		t.Errorf("CheckMonth was incorrect, got: %v, want: %v", month, true)
+	for name, tc := range tests {
+		testStats.Am = tc.input
+		got := testStats.checkMonth()
+		if got != tc.want {
+			t.Fatalf("%s: expected: %v, got: %v", name, tc.want, got)
+		}
 	}
 }
 
