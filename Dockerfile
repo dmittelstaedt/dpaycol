@@ -5,10 +5,9 @@ ARG https_proxy
 ENV http_proxy=${http_proxy}
 ENV https_proxy=${https_proxy}
 
-WORKDIR /go/src/app
+RUN git clone https://github.com/dmittelstaedt/dpaycol.git /go/src/app
 
-COPY .git .
-COPY dpaycol.go .
+WORKDIR /go/src/app
 
 RUN go get ./...
 RUN VERSION=$(git tag --list | tail -1 | cut -c 2-) && \
