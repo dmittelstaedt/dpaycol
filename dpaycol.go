@@ -69,6 +69,7 @@ func (rs *stats) writeJSON() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	if _, err := file.Write(bytes); err != nil {
 		log.Fatal(err)
