@@ -21,6 +21,6 @@ The output is written to json encoded file named stats-dpay.json.
 
 Build instructions:
 
-- docker build -t dataport.de/dpaycol --build-arg http_proxy=http://proxy:80 --build-arg https_proxy=http://proxy:80 .
+- docker build -t dataport.de/dpaycol --no-cache --build-arg http_proxy=http://proxy:80 --build-arg https_proxy=http://proxy:80 .
 - docker create -it --name dpaycol dataport.de/dpaycol
 - docker cp dpaycol:/go/src/app/dpaycol .
