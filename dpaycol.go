@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 )
@@ -27,16 +28,16 @@ type stats struct {
 
 // constantes for log file and name of the parameters
 const (
-	statsLog string = "stats-dpay.json"
-	ak       string = "ak"
-	am       string = "am"
-	ut       string = "ut"
-	lt       string = "lt"
-	jn       string = "jn"
-	jkid     string = "jkid"
-	e        string = "e"
-	rc       string = "rc"
-	v        string = "v"
+	statsLogFile string = "stats-dpay.json"
+	ak           string = "ak"
+	am           string = "am"
+	ut           string = "ut"
+	lt           string = "lt"
+	jn           string = "jn"
+	jkid         string = "jkid"
+	e            string = "e"
+	rc           string = "rc"
+	v            string = "v"
 )
 
 var runStats stats
@@ -66,7 +67,14 @@ func (rs *stats) writeJSON() {
 
 	bytes = append(bytes, "\n"...)
 
-	file, err := os.OpenFile(statsLog, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+	exec, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	execPath := filepath.Dir(exec)
+
+	statsLogPath := execPath + "/" + statsLogFile
+	file, err := os.OpenFile(statsLogPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
 	if err != nil {
 		log.Fatal(err)
 	}
