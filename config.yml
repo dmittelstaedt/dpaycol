@@ -1,0 +1,2 @@
+# Absolute path to stats file, default empty. Empty means in same directory as executable.
+statsPath:

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 // stats holds statistics of start or end of a job. IsEnd and RC are only used
@@ -26,18 +28,23 @@ type stats struct {
 	RC        int       `json:"rc"`
 }
 
+type configuration struct {
+	StatsPath string
+}
+
 // constantes for log file and name of the parameters
 const (
-	statsLogFile string = "stats-dpay.json"
-	ak           string = "ak"
-	am           string = "am"
-	ut           string = "ut"
-	lt           string = "lt"
-	jn           string = "jn"
-	jkid         string = "jkid"
-	e            string = "e"
-	rc           string = "rc"
-	v            string = "v"
+	configFile string = "config"
+	statsFile  string = "stats-dpay.json"
+	ak         string = "ak"
+	am         string = "am"
+	ut         string = "ut"
+	lt         string = "lt"
+	jn         string = "jn"
+	jkid       string = "jkid"
+	e          string = "e"
+	rc         string = "rc"
+	v          string = "v"
 )
 
 var runStats stats
@@ -45,6 +52,7 @@ var version *bool
 var versionNumber string
 var gitCommit string
 var buildDate string
+var execDir string
 
 func init() {
 	flag.StringVar(&runStats.Ak, ak, "", "Abrechnungskreis, required")
@@ -58,8 +66,35 @@ func init() {
 	version = flag.Bool(v, false, "Version")
 }
 
+// execDir sets the directory where the executable is located
+func setExecDir() {
+	exec, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	execDir = filepath.Dir(exec)
+}
+
+// readConfig reads configuration from file
+func readConfig() configuration {
+	viper.SetConfigName(configFile)
+	viper.AddConfigPath(execDir)
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var configuration configuration
+	err = viper.Unmarshal(&configuration)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return configuration
+}
+
 // writeJSON writes the run statistics to a file in JSON encoding.
-func (rs *stats) writeJSON() {
+func (rs *stats) writeJSON(c configuration) {
 	bytes, err := json.Marshal(rs)
 	if err != nil {
 		log.Fatal(err)
@@ -67,13 +102,13 @@ func (rs *stats) writeJSON() {
 
 	bytes = append(bytes, "\n"...)
 
-	exec, err := os.Executable()
-	if err != nil {
-		log.Fatal(err)
+	var statsLogPath string
+	if c.StatsPath == "" {
+		statsLogPath = execDir + "/" + statsFile
+	} else {
+		statsLogPath = c.StatsPath
 	}
-	execPath := filepath.Dir(exec)
 
-	statsLogPath := execPath + "/" + statsLogFile
 	file, err := os.OpenFile(statsLogPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
 	if err != nil {
 		log.Fatal(err)
@@ -134,6 +169,10 @@ func main() {
 	runStats.Timestamp = time.Now()
 	runStats.HostName, _ = os.Hostname()
 
+	setExecDir()
+
+	configuration := readConfig()
+
 	if *version {
 		fmt.Println("Version: " + versionNumber)
 		fmt.Println("Git Commit: " + gitCommit)
@@ -156,5 +195,5 @@ func main() {
 		os.Exit(3)
 	}
 
-	runStats.writeJSON()
+	runStats.writeJSON(configuration)
 }
