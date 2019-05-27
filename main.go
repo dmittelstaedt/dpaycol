@@ -79,9 +79,16 @@ func setExecDir() {
 func readConfig() configuration {
 	viper.SetConfigName(configFile)
 	viper.AddConfigPath(execDir)
+	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal(err)
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Fatal(err)
+		} else {
+			return configuration{
+				StatsPath: "",
+			}
+		}
 	}
 
 	var configuration configuration
