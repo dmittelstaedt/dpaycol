@@ -13,6 +13,6 @@ RUN go get ./...
 RUN VERSION=$(git tag --list | tail -1 | cut -c 2-) && \
 GIT_COMMIT=$(git rev-parse --short HEAD) && \
 BUILD_DATE=$(date +"%Y-%m-%d %T") && \
-go build -ldflags "-X main.versionNumber=$VERSION -X main.gitCommit=$GIT_COMMIT -X 'main.buildDate=$BUILD_DATE'" dpaycol.go
+go build -ldflags "-X main.versionNumber=$VERSION -X main.gitCommit=$GIT_COMMIT -X 'main.buildDate=$BUILD_DATE'" -o dpaycol main.go
 
 ENTRYPOINT [ "/bin/bash" ]
