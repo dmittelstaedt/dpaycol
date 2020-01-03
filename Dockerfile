@@ -1,18 +1,15 @@
-FROM golang:1.11
+FROM golang:1.13
 ARG http_proxy
 ARG https_proxy
 
 ENV http_proxy=${http_proxy}
 ENV https_proxy=${https_proxy}
+ENV app_root=/go/src/github.com/dmittelstaedt/dpaycol
 
-RUN git clone https://github.com/dmittelstaedt/dpaycol.git /go/src/app
+RUN mkdir -p ${app_root}
 
-WORKDIR /go/src/app
-
-RUN go get ./...
-RUN VERSION=$(git tag --list | tail -1 | cut -c 2-) && \
-GIT_COMMIT=$(git rev-parse --short HEAD) && \
-BUILD_DATE=$(date +"%Y-%m-%d %T") && \
-go build -ldflags "-X main.versionNumber=$VERSION -X main.gitCommit=$GIT_COMMIT -X 'main.buildDate=$BUILD_DATE'" -o dpaycol main.go
+COPY  ./ ${app_root}
+WORKDIR ${app_root}
+RUN make build
 
 ENTRYPOINT [ "/bin/bash" ]
