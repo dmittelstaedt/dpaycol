@@ -10,6 +10,7 @@ install:
 	echo "ToDo: Implement install"
 
 build:
+	go get github.com/spf13/viper
 	go get github.com/spf13/cobra/cobra
 	go build -ldflags "-X github.com/dmittelstaedt/dpaycol/cmd.versionNumber=$(VERSION) -X github.com/dmittelstaedt/dpaycol/cmd.gitCommit=$(GIT_COMMIT) -X 'github.com/dmittelstaedt/dpaycol/cmd.buildDate=$(BUILD_DATE)'" -o dpaycol main.go
 
