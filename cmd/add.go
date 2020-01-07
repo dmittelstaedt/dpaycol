@@ -17,9 +17,13 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
+	"log"
+	"os"
 	"time"
 
 	"github.com/dmittelstaedt/dpaycol/models"
+	"github.com/dmittelstaedt/dpaycol/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -29,15 +33,22 @@ var payroll models.Payroll
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Add payroll information to REST API",
+	Long: `Add payroll information to REST API including Abrechnungskreis, 
+Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		payroll.Timestamp = time.Now()
+		hostname, _ := os.Hostname()
+		apiURL := "http://" + configuration.APIEndpoint + "/servers?" + hostname
+		resp := utils.SendRequest("GET", apiURL)
+		defer resp.Body.Close()
+
+		var servers []models.Server
+		if err := json.NewDecoder(resp.Body).Decode(&servers); err != nil {
+			log.Println(err)
+		}
+
+		payroll.ServerID = servers[0].ID
 		if !payroll.CheckMonth() {
 			return models.ErrInvalidMonth
 		}
@@ -45,6 +56,15 @@ to quickly create a Cobra application.`,
 			return models.ErrEndCondition
 		}
 		payroll.WriteJSON(configuration, execDir, statsFile)
+		apiURLPayrolls := "http://" + configuration.APIEndpoint + "/payrolls"
+		respPayroll := utils.SendRequest("POST", apiURLPayrolls)
+		defer respPayroll.Body.Close()
+
+		var payrolls []models.Payroll
+		if err := json.NewDecoder(resp.Body).Decode(&payrolls); err != nil {
+			log.Println(err)
+		}
+
 		return nil
 	},
 }
