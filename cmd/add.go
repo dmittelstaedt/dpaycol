@@ -39,16 +39,8 @@ Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		payroll.Timestamp = time.Now()
 		hostname, _ := os.Hostname()
-		apiURL := "http://" + configuration.APIEndpoint + "/servers?" + hostname
-		resp := utils.SendRequest("GET", apiURL)
-		defer resp.Body.Close()
+		payroll.ServerID = utils.GetServerID("http://"+configuration.APIEndpoint+"/servers", hostname)
 
-		var servers []models.Server
-		if err := json.NewDecoder(resp.Body).Decode(&servers); err != nil {
-			log.Println(err)
-		}
-
-		payroll.ServerID = servers[0].ID
 		if !payroll.CheckMonth() {
 			return models.ErrInvalidMonth
 		}
@@ -56,13 +48,19 @@ Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 			return models.ErrEndCondition
 		}
 		payroll.WriteJSON(configuration, execDir, statsFile)
-		apiURLPayrolls := "http://" + configuration.APIEndpoint + "/payrolls"
-		respPayroll := utils.SendRequest("POST", apiURLPayrolls)
+
+		body, err := json.Marshal(payroll)
+		if err != nil {
+			log.Printf("Error marshalling payroll: %+v", err)
+			return models.ErrSendToAPI
+		}
+		respPayroll := utils.SendRequest("POST", "http://"+configuration.APIEndpoint+"/payrolls", body)
 		defer respPayroll.Body.Close()
 
-		var payrolls []models.Payroll
-		if err := json.NewDecoder(resp.Body).Decode(&payrolls); err != nil {
-			log.Println(err)
+		var payrollResp models.Payroll
+		if err := json.NewDecoder(respPayroll.Body).Decode(&payrollResp); err != nil {
+			log.Printf("Error decoding payroll: %+v", err)
+			return models.ErrSendToAPI
 		}
 
 		return nil

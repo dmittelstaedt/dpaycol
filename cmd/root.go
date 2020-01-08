@@ -52,6 +52,9 @@ information to a REST API.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
+		if err == models.ErrSendToAPI {
+			os.Exit(4)
+		}
 		if err == models.ErrEndCondition {
 			os.Exit(3)
 		}
