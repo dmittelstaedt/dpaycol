@@ -22,7 +22,7 @@ func GetExecDir() string {
 
 // GetServerID returns the id of the given name of the server
 func GetServerID(apiURL string, hostname string) int {
-	resp := SendRequest("GET", apiURL+"?"+hostname, nil)
+	resp := SendRequest("GET", apiURL+"?hostname="+hostname, nil)
 	defer resp.Body.Close()
 
 	var servers []models.Server
