@@ -29,6 +29,7 @@ import (
 )
 
 var payroll models.Payroll
+var worker string
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
@@ -40,6 +41,10 @@ Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 		payroll.Timestamp = time.Now()
 		hostname, _ := os.Hostname()
 		payroll.ServerID = utils.GetServerID("http://"+configuration.APIEndpoint+"/servers", hostname)
+		if cmd.Flags().Changed("worker") {
+			payroll.Worker.String = worker
+			payroll.Worker.Valid = true
+		}
 
 		if !payroll.CheckMonth() {
 			return models.ErrInvalidMonth
@@ -89,6 +94,7 @@ func init() {
 	addCmd.Flags().StringVarP(&payroll.Jobname, "jobname", "n", "", "Jobname (required)")
 	addCmd.MarkFlagRequired("jobname")
 	addCmd.Flags().StringVarP(&payroll.Jobkette, "jobkette", "i", "", "ID of the Jobkette (required)")
+	addCmd.Flags().StringVarP(&worker, "worker", "w", "", "Worker")
 	addCmd.MarkFlagRequired("jobkette")
 	addCmd.Flags().BoolVarP(&payroll.IsEnd, "end", "e", false, "End flag")
 	addCmd.Flags().IntVarP(&payroll.ReturnCode, "returncode", "r", -1, "Return Code of the job (required if end)")

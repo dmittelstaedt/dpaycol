@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Field worker to struct payroll
 
 ### Changed
 
@@ -28,4 +29,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Checks for correct arguments for flags
 
 [Unreleased]: https://github.com/dmittelstaedt/dpaycol
+[v0.0.1]: https://github.com/dmittelstaedt/dpaycol/tree/v0.0.3
+[v0.0.1]: https://github.com/dmittelstaedt/dpaycol/tree/v0.0.2
 [v0.0.1]: https://github.com/dmittelstaedt/dpaycol/tree/v0.0.1

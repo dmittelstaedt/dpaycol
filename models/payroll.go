@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"os"
@@ -10,18 +11,19 @@ import (
 
 // Payroll holds payroll information
 type Payroll struct {
-	ID               int       `json:"id"`
-	Kunde            string    `json:"kunde"`
-	Abrechnungskreis int       `json:"abrechnungskreis"`
-	Abrechnungsmonat string    `json:"abrechnungsmonat"`
-	Lauftermin       string    `json:"lauftermin"`
-	Untertermin      string    `json:"untertermin"`
-	Jobname          string    `json:"jobname"`
-	Jobkette         string    `json:"jobkette"`
-	IsEnd            bool      `json:"isEnd"`
-	ReturnCode       int       `json:"returnCode"`
-	Timestamp        time.Time `json:"timestamp"`
-	ServerID         int       `json:"serverId"`
+	ID               int            `json:"id"`
+	Kunde            string         `json:"kunde"`
+	Abrechnungskreis int            `json:"abrechnungskreis"`
+	Abrechnungsmonat string         `json:"abrechnungsmonat"`
+	Lauftermin       string         `json:"lauftermin"`
+	Untertermin      string         `json:"untertermin"`
+	Jobname          string         `json:"jobname"`
+	Jobkette         string         `json:"jobkette"`
+	Worker           sql.NullString `json:"worker"`
+	IsEnd            bool           `json:"isEnd"`
+	ReturnCode       int            `json:"returnCode"`
+	Timestamp        time.Time      `json:"timestamp"`
+	ServerID         int            `json:"serverId"`
 }
 
 // WriteJSON writes the run statistics to a file in JSON encoding.
