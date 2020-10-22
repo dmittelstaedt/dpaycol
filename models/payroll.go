@@ -23,6 +23,8 @@ type Payroll struct {
 	IsEnd            bool           `json:"isEnd"`
 	ReturnCode       int            `json:"returnCode"`
 	Timestamp        time.Time      `json:"timestamp"`
+	HeapXmx          int            `json:"heapXmx"`
+	Threads          sql.NullString `json:"threads"`
 	ServerID         int            `json:"serverId"`
 }
 

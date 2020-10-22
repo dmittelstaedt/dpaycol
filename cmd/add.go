@@ -30,6 +30,8 @@ import (
 
 var payroll models.Payroll
 var worker string
+var hostnameArg string
+var threads string
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
@@ -39,11 +41,21 @@ var addCmd = &cobra.Command{
 Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		payroll.Timestamp = time.Now()
-		hostname, _ := os.Hostname()
+		var hostname string
+		if cmd.Flags().Changed("server") {
+			hostname = hostnameArg
+		} else {
+			hostname, _ = os.Hostname()
+		}
 		payroll.ServerID = utils.GetServerID("http://"+configuration.APIEndpoint+"/servers", hostname)
 		if cmd.Flags().Changed("worker") {
 			payroll.Worker.String = worker
 			payroll.Worker.Valid = true
+		}
+
+		if cmd.Flags().Changed("threads") {
+			payroll.Threads.String = threads
+			payroll.Threads.Valid = true
 		}
 
 		if !payroll.CheckMonth() {
@@ -94,8 +106,11 @@ func init() {
 	addCmd.Flags().StringVarP(&payroll.Jobname, "jobname", "n", "", "Jobname (required)")
 	addCmd.MarkFlagRequired("jobname")
 	addCmd.Flags().StringVarP(&payroll.Jobkette, "jobkette", "i", "", "ID of the Jobkette (required)")
-	addCmd.Flags().StringVarP(&worker, "worker", "w", "", "Worker")
 	addCmd.MarkFlagRequired("jobkette")
+	addCmd.Flags().StringVarP(&worker, "worker", "w", "", "Worker")
+	addCmd.Flags().StringVarP(&hostnameArg, "server", "s", "", "Hostname of server")
+	addCmd.Flags().IntVarP(&payroll.HeapXmx, "xmx", "x", 0, "heap_xmx")
+	addCmd.Flags().StringVarP(&threads, "threads", "t", "", "Threads")
 	addCmd.Flags().BoolVarP(&payroll.IsEnd, "end", "e", false, "End flag")
 	addCmd.Flags().IntVarP(&payroll.ReturnCode, "returncode", "r", -1, "Return Code of the job (required if end)")
 }
