@@ -14,5 +14,5 @@ RUN make build
 
 FROM fedora:latest
 WORKDIR /root/
-COPY --from=0 ${app_root}/dpaycol .
+COPY --from=0 /data/dpaycol/dpaycol .
 ENTRYPOINT [ "/bin/bash" ]
