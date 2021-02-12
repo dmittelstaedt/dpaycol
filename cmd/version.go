@@ -25,6 +25,7 @@ import (
 var versionNumber string
 var gitCommit string
 var buildDate string
+var goVersionNumber string
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
@@ -36,6 +37,7 @@ git commit and build date`,
 		fmt.Println("Version: " + versionNumber)
 		fmt.Println("Git Commit: " + gitCommit)
 		fmt.Println("Build Date: " + buildDate)
+		fmt.Println("Go Version: " + goVersionNumber)
 	},
 }
 

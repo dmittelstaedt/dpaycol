@@ -32,6 +32,7 @@ var payroll models.Payroll
 var worker string
 var hostnameArg string
 var threads string
+var end bool
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
@@ -56,6 +57,14 @@ Abrechnungsmonat, Jobname and ID of the Jobkette.`,
 		if cmd.Flags().Changed("threads") {
 			payroll.Threads.String = threads
 			payroll.Threads.Valid = true
+		}
+
+		if cmd.Flags().Changed("end") {
+			if end {
+				payroll.IsEnd = 1
+			} else {
+				payroll.IsEnd = 0
+			}
 		}
 
 		if !payroll.CheckMonth() {
@@ -111,6 +120,6 @@ func init() {
 	addCmd.Flags().StringVarP(&hostnameArg, "server", "s", "", "Hostname of server")
 	addCmd.Flags().IntVarP(&payroll.HeapXmx, "xmx", "x", 0, "heap_xmx")
 	addCmd.Flags().StringVarP(&threads, "threads", "t", "", "Threads")
-	addCmd.Flags().BoolVarP(&payroll.IsEnd, "end", "e", false, "End flag")
+	addCmd.Flags().BoolVarP(&end, "end", "e", false, "End flag")
 	addCmd.Flags().IntVarP(&payroll.ReturnCode, "returncode", "r", -1, "Return Code of the job (required if end)")
 }

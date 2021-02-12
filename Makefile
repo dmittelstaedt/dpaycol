@@ -2,17 +2,17 @@ CONTAINERCMD=docker
 VERSION = $(shell git tag --list | tail -1 | cut -c 2-)
 GIT_COMMIT = $(shell git rev-parse --short HEAD)
 BUILD_DATE=$(shell date +"%Y-%m-%d %T")
+GO_VERSION=$(shell go version | awk '{print $$3}' | cut -c 3-)
 
 all:
 	echo "ToDo: Implement all $(CONTAINERCMD)"
 
 install:
 	echo "ToDo: Implement install"
+	echo $(GO_VERSION)
 
 build:
-	go get github.com/spf13/viper
-	go get github.com/spf13/cobra/cobra
-	go build -ldflags "-X github.com/dmittelstaedt/dpaycol/cmd.versionNumber=$(VERSION) -X github.com/dmittelstaedt/dpaycol/cmd.gitCommit=$(GIT_COMMIT) -X 'github.com/dmittelstaedt/dpaycol/cmd.buildDate=$(BUILD_DATE)'" -o dpaycol main.go
+	go build -ldflags "-X github.com/dmittelstaedt/dpaycol/cmd.versionNumber=$(VERSION) -X github.com/dmittelstaedt/dpaycol/cmd.gitCommit=$(GIT_COMMIT) -X 'github.com/dmittelstaedt/dpaycol/cmd.buildDate=$(BUILD_DATE)' -X github.com/dmittelstaedt/dpaycol/cmd.goVersionNumber=$(GO_VERSION)" -o dpaycol main.go
 
 build-container:
 	echo "Building image"
@@ -20,7 +20,7 @@ build-container:
 	echo "Creating container"
 	$(CONTAINERCMD) create -it --name dpaycol dataport.de/dpaycol
 	echo "Copying executable"
-	$(CONTAINERCMD) cp dpaycol:/go/src/github.com/dmittelstaedt/dpaycol/dpaycol .
+	$(CONTAINERCMD) cp dpaycol:/data/dpaycol/dpaycol .
 	echo "Removing container"
 	$(CONTAINERCMD) container rm dpaycol
 

@@ -39,7 +39,7 @@ type Server struct {
 	VLan        string            `json:"vlan"`
 	OSA         string            `json:"osa"`
 	Comment     sql.NullString    `json:"comment"`
-	Auto        bool              `json:"auto"`
+	Auto        int               `json:"auto"`
 	LparID      int               `json:"lparId"`
 	ServiceID   sql.NullInt64     `json:"serviceId"`
 }

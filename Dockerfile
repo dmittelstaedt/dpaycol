@@ -1,10 +1,10 @@
-FROM golang:1.13
+FROM golang:1.14
 ARG http_proxy
 ARG https_proxy
 
-ENV http_proxy=${http_proxy}
-ENV https_proxy=${https_proxy}
-ENV app_root=/go/src/github.com/dmittelstaedt/dpaycol
+ENV http_proxy=${http_proxy} \
+  https_proxy=${https_proxy} \
+  app_root=/data/dpaycol
 
 RUN mkdir -p ${app_root}
 

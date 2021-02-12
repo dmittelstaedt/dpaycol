@@ -20,7 +20,7 @@ type Payroll struct {
 	Jobname          string         `json:"jobname"`
 	Jobkette         string         `json:"jobkette"`
 	Worker           sql.NullString `json:"worker"`
-	IsEnd            bool           `json:"isEnd"`
+	IsEnd            int            `json:"isEnd"`
 	ReturnCode       int            `json:"returnCode"`
 	Timestamp        time.Time      `json:"timestamp"`
 	HeapXmx          int            `json:"heapXmx"`
@@ -66,10 +66,10 @@ func (payroll *Payroll) CheckMonth() bool {
 
 // CheckEnd checks whether a payroll struct has correct end condition or not
 func (payroll *Payroll) CheckEnd() bool {
-	if payroll.IsEnd == false && payroll.ReturnCode < 0 {
+	if payroll.IsEnd == 0 && payroll.ReturnCode < 0 {
 		return true
 	}
-	if payroll.IsEnd == true && payroll.ReturnCode >= 0 {
+	if payroll.IsEnd == 1 && payroll.ReturnCode >= 0 {
 		return true
 	}
 	return false
